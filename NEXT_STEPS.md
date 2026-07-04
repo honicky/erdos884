@@ -1,33 +1,28 @@
 # Next steps
 
-Status: the disproof is **complete and verified**. `Erdos884.lean` checks green on
-Lean 4.31.0 + Mathlib via the Axle hosted engine — 0 errors, 0 `sorry`, and
-`#print axioms Erdos884.erdos_884_disproof` = `[propext, Classical.choice, Quot.sound]`
-(the three standard Mathlib axioms only). The statement is token-identical to
+Status: the disproof is **complete and verified**, two independent ways (offline
+`lake build` against Mathlib `v4.31.0`, and the Axle hosted engine) — 0 errors, 0
+`sorry`, and `#print axioms Erdos884.erdos_884_disproof` =
+`[propext, Classical.choice, Quot.sound]` (the three standard Mathlib axioms only). The
+statement is token-identical to
 [google-deepmind/formal-conjectures `ErdosProblems/884.lean`](https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/ErdosProblems/884.lean).
 
 What remains is optional, in rough order of value.
 
-## 1. Local / offline reproducibility (Lake project) — recommended
+## 1. Offline reproducibility (Lake project) — DONE
 
-Right now verification runs through Axle's hosted environment. For a build any third
-party can reproduce offline, convert this into a Lake project pinned to Mathlib
-`v4.31.0`:
+The repo is a Lake project pinned to Mathlib `v4.31.0` (`lakefile.toml`,
+`lean-toolchain`, `lake-manifest.json`). `lake build` compiles `Erdos884.lean` offline
+against the cached Mathlib and reports the axiom footprint — see the README "Offline
+build" section. No further action required for basic offline reproducibility.
 
-- `lakefile.toml` (or `.lean`) with a `require mathlib` at rev `v4.31.0`, a
-  `lean-toolchain` of `leanprover/lean4:v4.31.0`, and a `lake-manifest.json`.
-- Give each module a real header (`import Mathlib`, plus `import Erdos884.<Dep>` for its
-  in-repo dependencies, in the order encoded in `modules/ORDER`) instead of relying on
-  concatenation. Move them under a source root (e.g. `Erdos884/`), and let the root
-  `Erdos884.lean` `import` them all rather than textually inlining them.
-- `elan` is already installed on this machine (`~/.elan/bin`). Expect a one-time Mathlib
-  cache download (`lake exe cache get`) of a few GB; a cold `lake build` then takes tens
-  of minutes.
-- Keep `scripts/verify.sh` (Axle) as a fast secondary check; add `lake build` as the
-  primary.
-
-The amalgamated single file remains useful for pasting into
-[live.lean-lang.org](https://live.lean-lang.org) and for the Axle check.
+**Optional refinement — multi-file library.** The Lake target is currently the single
+amalgamated file `Erdos884.lean` (one big compilation unit). For faster incremental
+builds and more idiomatic structure, split it into a real multi-file library: give each
+`modules/*.lean` a header (`import Mathlib` plus `import Erdos884.<Dep>` for its in-repo
+dependencies, in the order in `modules/ORDER`), move them under `Erdos884/`, and have the
+root `Erdos884.lean` `import` them instead of textually inlining. The amalgamated file
+stays useful for [live.lean-lang.org](https://live.lean-lang.org) and the Axle check.
 
 ## 2. Upstream the result
 

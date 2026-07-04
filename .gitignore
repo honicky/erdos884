@@ -12,3 +12,7 @@
 
 # verify.sh scratch
 /.axle-result.json
+
+# Lake logs (lake-manifest.json IS committed, for reproducibility)
+/lake-update.log
+/lake-build.log
