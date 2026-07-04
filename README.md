@@ -104,6 +104,7 @@ LICENSE              Apache-2.0
   Archimedean-large relative to the current product `n_r` and its minimum divisor log-gap `δ_r`.
 - `log* t` avoided: `K_r ≈ log t_r/((r+12)·loglog t_r)` gives the harmonic divergence directly.
 
-Produced with Claude (Fable 5) orchestrating parallel prover agents against the Axle
-verification API, July 2026. Papers: D. Larsen, *A question of Erdős on reciprocals of gaps
-between divisors*; T. Tao, *On the sum of reciprocals of gaps between divisors*.
+Formalised by Claude Fable 5, with guidance from R. J. Honicky (orchestrating parallel prover
+agents against the Axle verification API), July 2026. The mathematical disproof is due to
+Daniel Larsen. Papers: D. Larsen, *A question of Erdős on reciprocals of gaps between
+divisors*; T. Tao, *On the sum of reciprocals of gaps between divisors*.
