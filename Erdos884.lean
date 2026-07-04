@@ -5658,26 +5658,6 @@ theorem oneScale_primePart_le {B : Finset ℕ} {N K : ℕ}
 
 /-! ### Size bounds for divisors in terms of `ω` -/
 
-/-- If `0 ≤ u` and `2Ku ≤ 1` then `(1+u)^K ≤ 1 + 2Ku`. -/
-lemma os_one_add_pow_le {u : ℝ} (hu : 0 ≤ u) :
-    ∀ K : ℕ, 2 * K * u ≤ 1 → (1 + u) ^ K ≤ 1 + 2 * K * u := by
-  intro K
-  induction K with
-  | zero => intro _; norm_num
-  | succ K ih =>
-    intro hK1
-    push_cast at hK1 ⊢
-    have h2K : 2 * (K : ℝ) * u ≤ 1 := by
-      have hstep : 2 * (K : ℝ) * u ≤ 2 * ((K : ℝ) + 1) * u :=
-        mul_le_mul_of_nonneg_right (by linarith) hu
-      linarith
-    have h1u : (0 : ℝ) ≤ 1 + u := by linarith
-    have hKuu : 2 * (K : ℝ) * u * u ≤ 1 * u := mul_le_mul_of_nonneg_right h2K hu
-    calc (1 + u) ^ (K + 1) = (1 + u) ^ K * (1 + u) := pow_succ _ _
-      _ ≤ (1 + 2 * (K : ℝ) * u) * (1 + u) := mul_le_mul_of_nonneg_right (ih h2K) h1u
-      _ = 1 + 2 * (K : ℝ) * u + u + 2 * (K : ℝ) * u * u := by ring
-      _ ≤ 1 + 2 * ((K : ℝ) + 1) * u := by linarith
-
 /-- Window powers are at most twice the base power: `(x₀+H)^k ≤ 2·x₀^k` when `2KH ≤ x₀`. -/
 lemma os_window_pow_le {x₀ H K : ℕ} (h0 : 0 < x₀) (hKH : 2*K*H ≤ x₀) {k : ℕ} (hk : k ≤ K) :
     ((x₀:ℝ) + H) ^ k ≤ 2 * (x₀:ℝ) ^ k := by
@@ -5696,7 +5676,7 @@ lemma os_window_pow_le {x₀ H K : ℕ} (h0 : 0 < x₀) (hKH : 2*K*H ≤ x₀) {
   have hpk : (0:ℝ) ≤ (x₀:ℝ)^k := by positivity
   calc ((x₀:ℝ) + H) ^ k = (x₀:ℝ)^k * (1 + (H:ℝ)/x₀)^k := by rw [heq, mul_pow]
     _ ≤ (x₀:ℝ)^k * (1 + 2 * (k:ℝ) * ((H:ℝ)/x₀)) :=
-        mul_le_mul_of_nonneg_left (os_one_add_pow_le hu k hbound) hpk
+        mul_le_mul_of_nonneg_left (one_add_pow_le_aux hu k hbound) hpk
     _ ≤ (x₀:ℝ)^k * 2 := mul_le_mul_of_nonneg_left (by linarith) hpk
     _ = 2 * (x₀:ℝ)^k := by ring
 
@@ -7767,10 +7747,6 @@ lemma ms_pairSum_mono {B A : Finset ℕ} (h : B ⊆ A) : pairSum B ≤ pairSum A
       simp only [Finset.mem_singleton] at hi hj; omega)
   simpa using this
 
-/-- The product of the primes in `B` is nonzero. -/
-lemma ms_prodB_ne_zero {B : Finset ℕ} (hB : ∀ p ∈ B, p.Prime) : (∏ p ∈ B, p) ≠ 0 :=
-  (Finset.prod_pos fun p hp => (hB p hp).pos).ne'
-
 /-- Any member of `B` bounds the product of `B` from below. -/
 lemma ms_le_prodB {B : Finset ℕ} (hB : ∀ p ∈ B, p.Prime) {p : ℕ} (hp : p ∈ B) :
     p ≤ ∏ q ∈ B, q :=
@@ -7782,7 +7758,7 @@ lemma ms_pairSum_add_le {n : ℕ} (hn : n ≠ 0) {B : Finset ℕ}
     (hB : ∀ p ∈ B, p.Prime) (hgt : ∀ p ∈ B, n < p) :
     pairSum n.divisors + pairSum B ≤ pairSum ((n * ∏ p ∈ B, p).divisors) := by
   classical
-  have hm : (∏ p ∈ B, p) ≠ 0 := ms_prodB_ne_zero hB
+  have hm : (∏ p ∈ B, p) ≠ 0 := os_prodB_ne_zero hB
   have hnm : n * (∏ p ∈ B, p) ≠ 0 := mul_ne_zero hn hm
   have hsub1 : n.divisors ⊆ (n * ∏ p ∈ B, p).divisors := by
     intro d hd
@@ -8277,7 +8253,6 @@ lemma ms_scale_setup {ε T_C : ℝ} (C : ℝ) (hC : 0 < C) (hε : 0 < ε)
 
 /-! ### The multiscale recursion -/
 
-set_option maxHeartbeats 1600000 in
 /-- The growing sequence of states: at stage `r` we have `n` with harmonic-type
 pair-sum mass `A` and gap sum controlled by `A/(8C) + 3`. -/
 lemma ms_grow {ε T_C : ℝ} (C : ℝ) (hC : 0 < C) (hε : 0 < ε)
@@ -8297,7 +8272,7 @@ lemma ms_grow {ε T_C : ℝ} (C : ℝ) (hC : 0 < C) (hε : 0 < ε)
           hbig, hKH, hlogK, hγb, hη2K, hPlow, hmain, herr⟩ :=
         ms_scale_setup C hC hε hsel 13 (by norm_num) (n₀:ℝ) 0 (1/8) 1
           (le_refl 0) (by norm_num) one_pos (le_refl 1)
-      have hm0 : (∏ p ∈ B, p) ≠ 0 := ms_prodB_ne_zero hBp
+      have hm0 : (∏ p ∈ B, p) ≠ 0 := os_prodB_ne_zero hBp
       have hBne : B.Nonempty := Finset.card_pos.mp (by omega)
       obtain ⟨p₀, hp₀⟩ := hBne
       have hn₀m : n₀ ≤ ∏ p ∈ B, p := by
@@ -8342,7 +8317,7 @@ lemma ms_grow {ε T_C : ℝ} (C : ℝ) (hC : 0 < C) (hε : 0 < ε)
           hbig, hKH, hlogK, hγb, hη2K, hPlow, hmain, herr⟩ :=
         ms_scale_setup C hC hε hsel (r+13) (by omega) (4*(n:ℝ))
           (2*gapSum n.divisors + 16/δ) ((1/2:ℝ)^(r+2)) δ hE0 (by positivity) hδ0 hδ1
-      have hm0 : (∏ p ∈ B, p) ≠ 0 := ms_prodB_ne_zero hBp
+      have hm0 : (∏ p ∈ B, p) ≠ 0 := os_prodB_ne_zero hBp
       have hnm0 : n * ∏ p ∈ B, p ≠ 0 := mul_ne_zero hn0 hm0
       have hnx₀ : n ≤ x₀ := by
         have h1 : (n:ℝ) ≤ (x₀:ℝ) := by

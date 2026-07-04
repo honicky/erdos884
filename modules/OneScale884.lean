@@ -133,26 +133,6 @@ theorem oneScale_primePart_le {B : Finset ℕ} {N K : ℕ}
 
 /-! ### Size bounds for divisors in terms of `ω` -/
 
-/-- If `0 ≤ u` and `2Ku ≤ 1` then `(1+u)^K ≤ 1 + 2Ku`. -/
-lemma os_one_add_pow_le {u : ℝ} (hu : 0 ≤ u) :
-    ∀ K : ℕ, 2 * K * u ≤ 1 → (1 + u) ^ K ≤ 1 + 2 * K * u := by
-  intro K
-  induction K with
-  | zero => intro _; norm_num
-  | succ K ih =>
-    intro hK1
-    push_cast at hK1 ⊢
-    have h2K : 2 * (K : ℝ) * u ≤ 1 := by
-      have hstep : 2 * (K : ℝ) * u ≤ 2 * ((K : ℝ) + 1) * u :=
-        mul_le_mul_of_nonneg_right (by linarith) hu
-      linarith
-    have h1u : (0 : ℝ) ≤ 1 + u := by linarith
-    have hKuu : 2 * (K : ℝ) * u * u ≤ 1 * u := mul_le_mul_of_nonneg_right h2K hu
-    calc (1 + u) ^ (K + 1) = (1 + u) ^ K * (1 + u) := pow_succ _ _
-      _ ≤ (1 + 2 * (K : ℝ) * u) * (1 + u) := mul_le_mul_of_nonneg_right (ih h2K) h1u
-      _ = 1 + 2 * (K : ℝ) * u + u + 2 * (K : ℝ) * u * u := by ring
-      _ ≤ 1 + 2 * ((K : ℝ) + 1) * u := by linarith
-
 /-- Window powers are at most twice the base power: `(x₀+H)^k ≤ 2·x₀^k` when `2KH ≤ x₀`. -/
 lemma os_window_pow_le {x₀ H K : ℕ} (h0 : 0 < x₀) (hKH : 2*K*H ≤ x₀) {k : ℕ} (hk : k ≤ K) :
     ((x₀:ℝ) + H) ^ k ≤ 2 * (x₀:ℝ) ^ k := by
@@ -171,7 +151,7 @@ lemma os_window_pow_le {x₀ H K : ℕ} (h0 : 0 < x₀) (hKH : 2*K*H ≤ x₀) {
   have hpk : (0:ℝ) ≤ (x₀:ℝ)^k := by positivity
   calc ((x₀:ℝ) + H) ^ k = (x₀:ℝ)^k * (1 + (H:ℝ)/x₀)^k := by rw [heq, mul_pow]
     _ ≤ (x₀:ℝ)^k * (1 + 2 * (k:ℝ) * ((H:ℝ)/x₀)) :=
-        mul_le_mul_of_nonneg_left (os_one_add_pow_le hu k hbound) hpk
+        mul_le_mul_of_nonneg_left (one_add_pow_le_aux hu k hbound) hpk
     _ ≤ (x₀:ℝ)^k * 2 := mul_le_mul_of_nonneg_left (by linarith) hpk
     _ = 2 * (x₀:ℝ)^k := by ring
 
