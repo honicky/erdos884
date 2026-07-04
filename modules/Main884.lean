@@ -38,4 +38,19 @@ theorem erdos_884_disproof :
     hb.trans (mul_le_mul_of_nonneg_right (le_max_left c 1) (by linarith))
   exact absurd hchain (not_le.mpr hlt)
 
+/--
+The disproof in the exact shape of the google-deepmind/formal-conjectures statement
+`Erdos884.erdos_884 : answer(False) ↔ Erdos884Prop`.
+
+There `answer(False)` reduces to `False`, and `Erdos884Prop` is
+`sumDivisorInvPairwiseDifference ≪ 1 + sumDivisorInvConsecutiveDifference`, where `≪` is
+their notation for `Asymptotics.IsBigO Filter.atTop`. Unfolding both, that statement is
+exactly the `↔` below, discharged by `erdos_884_disproof`. This is the formal proof
+referenced by the `@[formal_proof using lean4 at …]` attribute on `erdos_884`.
+-/
+theorem erdos_884_iff_false :
+    False ↔ sumDivisorInvPairwiseDifference =O[Filter.atTop]
+      (1 + sumDivisorInvConsecutiveDifference) :=
+  iff_of_false not_false erdos_884_disproof
+
 end Erdos884
