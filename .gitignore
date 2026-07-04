@@ -1,0 +1,14 @@
+# Lean / Lake build artifacts (present once this becomes a Lake project)
+/.lake/
+/lake-packages/
+/build/
+*.olean
+*.ilean
+*.trace
+
+# Editor / OS
+.DS_Store
+*.swp
+
+# verify.sh scratch
+/.axle-result.json
